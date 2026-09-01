@@ -267,7 +267,7 @@ button {
   border: 0;
   border-radius: var(--radius);
   padding: 13px 18px;
-  background: var(--primary);
+  background: var(--pending);
   color: #fff;
   box-shadow: var(--shadow);
   font-weight: 700;
@@ -275,7 +275,6 @@ button {
 
 .floating-add .fa-duotone {
   --fa-primary-color: #fff;
-  --fa-secondary-color: var(--pending);
   --fa-secondary-opacity: 1;
 }
 
