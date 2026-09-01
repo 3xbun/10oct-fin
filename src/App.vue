@@ -7,14 +7,13 @@ import ExpenseForm from './components/ExpenseForm.vue'
 import ExpenseList from './components/ExpenseList.vue'
 import MonthTabs from './components/MonthTabs.vue'
 import SummaryCards from './components/SummaryCards.vue'
-import { createExpense, createPayment, deleteExpense, deletePayment, listExpenses, listPayments, updateExpense } from './api'
+import { createExpense, deleteExpense, listExpenses, listPayments, updateExpense } from './api'
 
 dayjs.locale('th')
 
 const months = computed(() => Array.from({ length: 8 }, (_, index) => dayjs().startOf('month').add(index - 1, 'month').format('YYYY-MM')))
 const selectedMonth = ref(dayjs().startOf('month').format('YYYY-MM'))
 const showForm = ref(false)
-const filter = ref('all')
 const editingId = ref(null)
 const editDraft = ref(null)
 const payments = ref([])
@@ -47,7 +46,6 @@ const currentExpenses = computed(() => expenses.value.filter((expense) => isDueI
 }))
 const titleCollator = new Intl.Collator(['th', 'en'], { numeric: true, sensitivity: 'base' })
 const visibleExpenses = computed(() => currentExpenses.value
-  .filter((item) => filter.value === 'all' || (filter.value === 'open' ? !item.paid : item.paid))
   .sort((first, second) => Number(first.isDeduction) - Number(second.isDeduction) || first.type.localeCompare(second.type) || titleCollator.compare(first.name || '', second.name || '')))
 const total = computed(() => currentExpenses.value.filter((item) => !item.isDeduction).reduce((sum, item) => sum + item.amount, 0) - currentExpenses.value.filter((item) => item.isDeduction && !item.isPaidDeduction).reduce((sum, item) => sum + Math.abs(item.amount), 0))
 const paidTotal = computed(() => currentExpenses.value.filter((item) => item.paid && !item.isDeduction).reduce((sum, item) => sum + item.amount, 0) + currentExpenses.value.filter((item) => item.isPaidDeduction).reduce((sum, item) => sum + Math.abs(item.amount), 0))
@@ -79,13 +77,6 @@ function duplicateExpense(item) {
   createExpense({ Title: item.name, amount: item.masterAmount || item.amount, type: item.type, note: item.note || null, active: true, date: monthDate.value, installment_total: item.type === 'installment' ? item.installmentTotal : null }).then(loadData).catch(showError)
 }
 
-function togglePaid(item) {
-  const operation = item.paid
-    ? (item.paymentId ? deletePayment(item.paymentId) : Promise.resolve())
-    : createPayment({ Title: item.name, expense_id: String(item.id), amount: item.amount, payment_date: monthDate.value, installment_number: item.installmentNumber || null, note: item.note || null })
-  operation.then(loadData).catch(showError)
-}
-
 function removeExpense(id) { deleteExpense(id).then(loadData).catch(showError) }
 async function loadData() { loading.value = true; try { expenses.value = await listExpenses(); payments.value = await listPayments() } catch (loadError) { showError(loadError) } finally { loading.value = false } }
 function showError(loadError) { error.value = loadError.message }
@@ -100,7 +91,7 @@ loadData()
     <p v-if="error" class="api-error">{{ error }}</p><p v-if="loading" class="loading-state">กำลังโหลดข้อมูล...</p>
     <Transition enter-active-class="animate__animated animate__fadeIn" leave-active-class="animate__animated animate__fadeOut"><ExpenseForm v-if="showForm" @submit="addExpense" @close="showForm = false" /></Transition>
     <SummaryCards class="animate__animated animate__fadeInUp" :month="selectedMonth" :total="total" :paid-total="paidTotal" :open-total="openTotal" :progress="progress" :paid-count="currentExpenses.filter(item => item.paid).length" :open-count="currentExpenses.filter(item => !item.paid).length" :format-money="formatMoney" />
-    <ExpenseList class="animate__animated animate__fadeInUp" :month="selectedMonth" :expenses="visibleExpenses" :filter="filter" :editing-id="editingId" :edit-draft="editDraft" @filter="filter = $event" @toggle-paid="togglePaid" @edit="startEditing" @save-edit="saveEditing" @cancel-edit="cancelEditing" @duplicate="duplicateExpense" @remove="removeExpense" @add="showForm = true" />
+    <ExpenseList class="animate__animated animate__fadeInUp" :month="selectedMonth" :expenses="visibleExpenses" :editing-id="editingId" :edit-draft="editDraft" @edit="startEditing" @save-edit="saveEditing" @cancel-edit="cancelEditing" @duplicate="duplicateExpense" @remove="removeExpense" @add="showForm = true" />
     <button class="floating-add animate__animated animate__fadeInUp" :aria-label="showForm ? 'ปิดแบบฟอร์มเพิ่มรายการ' : 'เพิ่มรายการ'" :title="showForm ? 'ปิดแบบฟอร์มเพิ่มรายการ' : 'เพิ่มรายการ'" @click="showForm = !showForm"><i :class="showForm ? 'fa-duotone fa-solid fa-xmark' : 'fa-duotone fa-solid fa-plus'" aria-hidden="true"></i><span>{{ showForm ? 'ปิด' : 'เพิ่มรายการ' }}</span></button>
     <footer><span>บันทึกอัตโนมัติในเครื่องนี้</span><span>อัปเดตล่าสุด · วันนี้</span></footer>
   </main>
