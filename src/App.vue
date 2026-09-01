@@ -49,8 +49,8 @@ const titleCollator = new Intl.Collator(['th', 'en'], { numeric: true, sensitivi
 const visibleExpenses = computed(() => currentExpenses.value
   .filter((item) => filter.value === 'all' || (filter.value === 'open' ? !item.paid : item.paid))
   .sort((first, second) => Number(first.isDeduction) - Number(second.isDeduction) || first.type.localeCompare(second.type) || titleCollator.compare(first.name || '', second.name || '')))
-const total = computed(() => currentExpenses.value.reduce((sum, item) => sum + item.amount, 0))
-const paidTotal = computed(() => currentExpenses.value.filter((item) => item.paid && !item.isDeduction).reduce((sum, item) => sum + item.amount, 0))
+const total = computed(() => currentExpenses.value.filter((item) => !item.isDeduction).reduce((sum, item) => sum + item.amount, 0) - currentExpenses.value.filter((item) => item.isDeduction && !item.isPaidDeduction).reduce((sum, item) => sum + Math.abs(item.amount), 0))
+const paidTotal = computed(() => currentExpenses.value.filter((item) => item.paid && !item.isDeduction).reduce((sum, item) => sum + item.amount, 0) + currentExpenses.value.filter((item) => item.isPaidDeduction).reduce((sum, item) => sum + Math.abs(item.amount), 0))
 const openTotal = computed(() => total.value - paidTotal.value)
 const progress = computed(() => total.value ? Math.round((paidTotal.value / total.value) * 100) : 0)
 const formatMoney = (amount) => new Intl.NumberFormat('th-TH').format(amount)
