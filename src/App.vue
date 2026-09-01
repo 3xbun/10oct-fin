@@ -11,7 +11,7 @@ import { createExpense, createPayment, deleteExpense, deletePayment, listExpense
 
 dayjs.locale('th')
 
-const months = computed(() => Array.from({ length: 6 }, (_, index) => dayjs().startOf('month').add(index, 'month').format('YYYY-MM')))
+const months = computed(() => Array.from({ length: 8 }, (_, index) => dayjs().startOf('month').add(index - 1, 'month').format('YYYY-MM')))
 const selectedMonth = ref(dayjs().startOf('month').format('YYYY-MM'))
 const showForm = ref(false)
 const filter = ref('all')
