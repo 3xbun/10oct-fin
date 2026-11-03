@@ -8,6 +8,7 @@ import ExpenseList from './components/ExpenseList.vue'
 import MonthTabs from './components/MonthTabs.vue'
 import SummaryCards from './components/SummaryCards.vue'
 import { createExpense, deleteExpense, listExpenses, listPayments, updateExpense } from './api'
+import { BANKS } from './banks'
 
 dayjs.locale('th')
 
@@ -53,7 +54,6 @@ const openTotal = computed(() => total.value - paidTotal.value)
 const progress = computed(() => total.value ? Math.round((paidTotal.value / total.value) * 100) : 0)
 const formatMoney = (amount) => new Intl.NumberFormat('th-TH').format(amount)
 
-const BANKS = ['TTB', 'KBank', 'SCB', 'BBL', 'KTC']
 function addExpense(form) {
   createExpense({ Title: form.name, amount: Number(form.amount), type: form.type, note: form.note || null, bank: form.bank || null, active: true, date: monthDate.value, installment_total: form.type === 'installment' ? Number(form.months) || 1 : null }).then(loadData).catch(showError)
   showForm.value = false

@@ -527,18 +527,22 @@ button {
   display: inline-flex;
   align-items: center;
   margin-top: 4px;
-  padding: 2px 7px;
-  border-radius: 4px;
-  font-weight: 700;
-  font-size: 11px;
-  line-height: 1.35;
-  color: #0f5c8a;
-  background: #e3f2fd;
+  padding: 2px 4px;
+  border-radius: 5px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.finance-table .bank-badge img {
+  display: block;
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
 }
 
 :root[data-theme='dark'] .finance-table .bank-badge {
-  color: #9fd4ff;
-  background: #123a52;
+  background: var(--surface);
+  border-color: var(--line);
 }
 
 .finance-row-right {
