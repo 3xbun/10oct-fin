@@ -61,10 +61,12 @@ const deductionsOpen = ref(true)
               <div class="finance-row-info">
                 <strong>{{ item.name }}</strong>
                 <span v-if="item.note" class="finance-note">{{ item.note }}</span>
-                <span v-if="item.bank" class="bank-badge" :title="item.bank"><img v-if="bankLogo(item.bank)" :src="bankLogo(item.bank)" :alt="item.bank" /><template v-else>{{ item.bank }}</template></span>
+                <span class="row-meta">
+                  <span v-if="item.bank" class="bank-badge" :title="item.bank"><img v-if="bankLogo(item.bank)" :src="bankLogo(item.bank)" :alt="item.bank" /><template v-else>{{ item.bank }}</template></span>
                 <span class="type-label" :class="`type-${item.type}`" :title="typeLabel(item)"><i
                     class="fa-duotone fa-solid" :class="typeIcon(item)" aria-hidden="true"></i>{{ item.installmentTotal ?
                       `ผ่อน · ${item.installmentNumber}/${item.installmentTotal}` : typeLabel(item) }}</span>
+                </span>
               </div>
               <div class="finance-row-right">
                 <strong class="amount">{{ formatSign(item.amount) }} ฿</strong>
@@ -111,9 +113,11 @@ const deductionsOpen = ref(true)
               <div class="finance-row-info">
                 <strong>{{ item.name }}</strong>
                 <span v-if="item.note" class="finance-note">{{ item.note }}</span>
-                <span v-if="item.bank" class="bank-badge" :title="item.bank"><img v-if="bankLogo(item.bank)" :src="bankLogo(item.bank)" :alt="item.bank" /><template v-else>{{ item.bank }}</template></span>
+                <span class="row-meta">
+                  <span v-if="item.bank" class="bank-badge" :title="item.bank"><img v-if="bankLogo(item.bank)" :src="bankLogo(item.bank)" :alt="item.bank" /><template v-else>{{ item.bank }}</template></span>
                 <span class="type-label deduction" :title="typeLabel(item)"><i
                     class="fa-duotone fa-solid fa-arrow-down-left" aria-hidden="true"></i>{{ typeLabel(item) }}</span>
+                </span>
               </div>
               <div class="finance-row-right">
                 <strong class="amount deduction">{{ formatSign(item.amount) }} ฿</strong>

@@ -533,6 +533,18 @@ button {
   border: 1px solid var(--line);
 }
 
+.finance-table .row-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.finance-table .row-meta .bank-badge,
+.finance-table .row-meta .type-label {
+  margin-top: 0;
+}
+
 .finance-table .bank-badge img {
   display: block;
   width: 16px;
