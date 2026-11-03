@@ -70,7 +70,14 @@ function cancelEditing() {
 
 function saveEditing() {
   if (!editDraft.value?.name || !editDraft.value?.amount) return
-  updateExpense(editingId.value, { Title: editDraft.value.name, amount: Number(editDraft.value.masterAmount || editDraft.value.amount), type: editDraft.value.type, note: editDraft.value.note || null, installment_total: editDraft.value.type === 'installment' ? Number(editDraft.value.installmentTotal) || 1 : null }).then(() => { cancelEditing(); return loadData() }).catch(showError)
+  const draft = editDraft.value
+  // The row shows the per-month amount for installments (and negative for
+  // [PAID]/[KN] deductions), so convert the edited value back to the stored
+  // total. Using masterAmount here would always write back the old value.
+  const base = Math.abs(Number(draft.amount)) || 0
+  const months = Number(draft.installmentTotal) || 1
+  const amount = draft.type === 'installment' ? base * months : base
+  updateExpense(editingId.value, { Title: draft.name, amount, type: draft.type, note: draft.note || null, installment_total: draft.type === 'installment' ? months : null }).then(() => { cancelEditing(); return loadData() }).catch(showError)
 }
 
 function duplicateExpense(item) {
