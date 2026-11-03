@@ -6,6 +6,7 @@ import 'dayjs/locale/th'
 defineProps({
   expenses: { type: Array, required: true },
   month: { type: String, required: true },
+  banks: { type: Array, default: () => [] },
   editingId: { type: Number, default: null },
   editDraft: { type: Object, default: null },
 })
@@ -44,6 +45,8 @@ const deductionsOpen = ref(true)
                     <option value="installment">ผ่อนชำระ</option>
                     <option value="one-off">ครั้งเดียว</option>
                     <option value="split">แบ่งจ่าย</option>
+                  </select><select v-model="editDraft.bank" class="edit-bank-select" aria-label="ธนาคาร"><option value="">ธนาคาร (ถ้ามี)</option>
+                    <option v-for="bank in banks" :key="bank" :value="bank">{{ bank }}</option>
                   </select><input v-if="editDraft.type === 'installment'" v-model="editDraft.installmentTotal"
                     type="number" min="1" aria-label="จำนวนงวดทั้งหมด" /></div>
                 <input v-model="editDraft.amount" class="edit-amount" type="number" min="0" aria-label="จำนวนเงิน" />
@@ -57,6 +60,7 @@ const deductionsOpen = ref(true)
               <div class="finance-row-info">
                 <strong>{{ item.name }}</strong>
                 <span v-if="item.note" class="finance-note">{{ item.note }}</span>
+                <span v-if="item.bank" class="bank-badge" :title="item.bank">{{ item.bank }}</span>
                 <span class="type-label" :class="`type-${item.type}`" :title="typeLabel(item)"><i
                     class="fa-duotone fa-solid" :class="typeIcon(item)" aria-hidden="true"></i>{{ item.installmentTotal ?
                       `ผ่อน · ${item.installmentNumber}/${item.installmentTotal}` : typeLabel(item) }}</span>
@@ -106,6 +110,7 @@ const deductionsOpen = ref(true)
               <div class="finance-row-info">
                 <strong>{{ item.name }}</strong>
                 <span v-if="item.note" class="finance-note">{{ item.note }}</span>
+                <span v-if="item.bank" class="bank-badge" :title="item.bank">{{ item.bank }}</span>
                 <span class="type-label deduction" :title="typeLabel(item)"><i
                     class="fa-duotone fa-solid fa-arrow-down-left" aria-hidden="true"></i>{{ typeLabel(item) }}</span>
               </div>

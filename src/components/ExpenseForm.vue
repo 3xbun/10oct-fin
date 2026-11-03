@@ -2,7 +2,10 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 const emit = defineEmits(['submit', 'close'])
-const emptyForm = () => ({ name: '', amount: '', installmentValue: '', installmentMode: 'monthly', months: 1, type: 'one-off', note: '' })
+defineProps({
+  banks: { type: Array, default: () => [] },
+})
+const emptyForm = () => ({ name: '', amount: '', installmentValue: '', installmentMode: 'monthly', months: 1, type: 'one-off', bank: '', note: '' })
 const form = ref(emptyForm())
 
 function submit() {
@@ -29,6 +32,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', closeOnEscape))
       <form class="expense-form" @submit.prevent="submit">
         <input class="expense-name-input" v-model="form.name" placeholder="ชื่อรายการ" aria-label="ชื่อรายการ" autofocus />
         <select class="expense-type-select" v-model="form.type" aria-label="ประเภท"><option value="one-off">ครั้งเดียว</option><option value="fixed">ทุกเดือน</option><option value="installment">ผ่อนชำระ</option></select>
+        <select class="expense-bank-select" v-model="form.bank" aria-label="ธนาคาร"><option value="" disabled>เลือกธนาคาร (ถ้ามี)</option><option v-for="bank in banks" :key="bank" :value="bank">{{ bank }}</option></select>
         <template v-if="form.type === 'installment'"><select class="installment-mode-select" v-model="form.installmentMode" aria-label="วิธีกรอกยอดผ่อน"><option value="monthly">ยอดต่อเดือน</option><option value="total">ยอดรวมทั้งหมด</option></select><input class="expense-amount-input" v-model="form.installmentValue" type="number" min="0" :placeholder="form.installmentMode === 'monthly' ? 'จ่ายเดือนละ' : 'ยอดซื้อทั้งหมด'" aria-label="ยอดผ่อน" /><input class="installment-months-input" v-model="form.months" type="number" min="1" placeholder="จำนวนเดือน" aria-label="จำนวนเดือน" /></template>
         <input v-else class="expense-amount-input" v-model="form.amount" type="number" min="0" placeholder="จำนวนเงิน" aria-label="จำนวนเงิน" />
         <input class="expense-note-input" v-model="form.note" placeholder="หมายเหตุ (ถ้ามี)" aria-label="หมายเหตุ" />

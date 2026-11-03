@@ -523,6 +523,24 @@ button {
   margin-top: 2px;
 }
 
+.finance-table .bank-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 4px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 1.35;
+  color: #0f5c8a;
+  background: #e3f2fd;
+}
+
+:root[data-theme='dark'] .finance-table .bank-badge {
+  color: #9fd4ff;
+  background: #123a52;
+}
+
 .finance-row-right {
   display: flex;
   align-items: center;

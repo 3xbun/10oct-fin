@@ -53,8 +53,9 @@ const openTotal = computed(() => total.value - paidTotal.value)
 const progress = computed(() => total.value ? Math.round((paidTotal.value / total.value) * 100) : 0)
 const formatMoney = (amount) => new Intl.NumberFormat('th-TH').format(amount)
 
+const BANKS = ['TTB', 'KBank', 'SCB', 'BBL', 'KTC']
 function addExpense(form) {
-  createExpense({ Title: form.name, amount: Number(form.amount), type: form.type, note: form.note || null, active: true, date: monthDate.value, installment_total: form.type === 'installment' ? Number(form.months) || 1 : null }).then(loadData).catch(showError)
+  createExpense({ Title: form.name, amount: Number(form.amount), type: form.type, note: form.note || null, bank: form.bank || null, active: true, date: monthDate.value, installment_total: form.type === 'installment' ? Number(form.months) || 1 : null }).then(loadData).catch(showError)
   showForm.value = false
 }
 
@@ -77,11 +78,11 @@ function saveEditing() {
   const base = Math.abs(Number(draft.amount)) || 0
   const months = Number(draft.installmentTotal) || 1
   const amount = draft.type === 'installment' ? base * months : base
-  updateExpense(editingId.value, { Title: draft.name, amount, type: draft.type, note: draft.note || null, installment_total: draft.type === 'installment' ? months : null }).then(() => { cancelEditing(); return loadData() }).catch(showError)
+  updateExpense(editingId.value, { Title: draft.name, amount, type: draft.type, note: draft.note || null, bank: draft.bank || null, installment_total: draft.type === 'installment' ? months : null }).then(() => { cancelEditing(); return loadData() }).catch(showError)
 }
 
 function duplicateExpense(item) {
-  createExpense({ Title: item.name, amount: item.masterAmount || item.amount, type: item.type, note: item.note || null, active: true, date: monthDate.value, installment_total: item.type === 'installment' ? item.installmentTotal : null }).then(loadData).catch(showError)
+  createExpense({ Title: item.name, amount: item.masterAmount || item.amount, type: item.type, note: item.note || null, bank: item.bank || null, active: true, date: monthDate.value, installment_total: item.type === 'installment' ? item.installmentTotal : null }).then(loadData).catch(showError)
 }
 
 function removeExpense(id) { deleteExpense(id).then(loadData).catch(showError) }
@@ -96,9 +97,9 @@ loadData()
     <section class="intro animate__animated animate__fadeInUp"><div><p class="eyebrow">OUR MONEY / 2026</p><h1>รายการใช้จ่าย<br /><em>ของผู้มีอันจะกิน</em></h1></div></section>
     <MonthTabs class="animate__animated animate__fadeInUp" :months="months" :selected-month="selectedMonth" :expenses="monthCounts" @select="selectedMonth = $event" />
     <p v-if="error" class="api-error">{{ error }}</p><p v-if="loading" class="loading-state">กำลังโหลดข้อมูล...</p>
-    <Transition enter-active-class="animate__animated animate__fadeIn" leave-active-class="animate__animated animate__fadeOut"><ExpenseForm v-if="showForm" @submit="addExpense" @close="showForm = false" /></Transition>
+    <Transition enter-active-class="animate__animated animate__fadeIn" leave-active-class="animate__animated animate__fadeOut"><ExpenseForm v-if="showForm" :banks="BANKS" @submit="addExpense" @close="showForm = false" /></Transition>
     <SummaryCards class="animate__animated animate__fadeInUp" :month="selectedMonth" :total="total" :paid-total="paidTotal" :open-total="openTotal" :progress="progress" :paid-count="currentExpenses.filter(item => item.paid).length" :open-count="currentExpenses.filter(item => !item.paid).length" :format-money="formatMoney" />
-    <ExpenseList class="animate__animated animate__fadeInUp" :month="selectedMonth" :expenses="visibleExpenses" :editing-id="editingId" :edit-draft="editDraft" @edit="startEditing" @save-edit="saveEditing" @cancel-edit="cancelEditing" @duplicate="duplicateExpense" @remove="removeExpense" @add="showForm = true" />
+    <ExpenseList class="animate__animated animate__fadeInUp" :month="selectedMonth" :expenses="visibleExpenses" :banks="BANKS" :editing-id="editingId" :edit-draft="editDraft" @edit="startEditing" @save-edit="saveEditing" @cancel-edit="cancelEditing" @duplicate="duplicateExpense" @remove="removeExpense" @add="showForm = true" />
     <button class="floating-add animate__animated animate__fadeInUp" :aria-label="showForm ? 'ปิดแบบฟอร์มเพิ่มรายการ' : 'เพิ่มรายการ'" :title="showForm ? 'ปิดแบบฟอร์มเพิ่มรายการ' : 'เพิ่มรายการ'" @click="showForm = !showForm"><i :class="showForm ? 'fa-duotone fa-solid fa-xmark' : 'fa-duotone fa-solid fa-plus'" aria-hidden="true"></i><span>{{ showForm ? 'ปิด' : 'เพิ่มรายการ' }}</span></button>
     <footer><span>บันทึกอัตโนมัติในเครื่องนี้</span><span>อัปเดตล่าสุด · วันนี้</span></footer>
   </main>
